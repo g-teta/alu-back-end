@@ -3,31 +3,20 @@
 import requests
 import sys
 
-if __name__ == "__main__":
-    # Get employee ID from command line argument
-    if len(sys.argv) != 2:
-        print("Usage: ./0-gather_data_from_an_API.py <employee_id>")
-        sys.exit(1)
+if __name__ == '__main__':
+    """gather data from an api"""
+    response_todos = requests.get(
+        "https://jsonplaceholder.typicode.com/user/" + sys.argv[1] + "/todos"
+    )
+    data = response_todos.json()
+    completed_tasks = []
+    for i in data:
+        if i['completed']:
+            completed_tasks.append(i['title'])
 
-    employee_id = sys.argv[1]
-
-    # API endpoints
-    url_user = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
-    url_todos = f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}"
-
-    # Get employee information
-    user = requests.get(url_user).json()
-    todos = requests.get(url_todos).json()
-
-    employee_name = user.get("name")
-
-    # Filter completed tasks
-    done_tasks = [task for task in todos if task.get("completed") is True]
-
-    # Display progress
-    print(f"Employee {employee_name} is done with tasks({len(done_tasks)}/{len(todos)}):")
-
-    # Print completed task titles
-    for task in done_tasks:
-        print(f"\t {task.get('title')}")
-
+    user = requests.get(
+        "https://jsonplaceholder.typicode.com/users/" + sys.argv[1]
+    ).json()
+    print("Employee {} is done with tasks({}/{}):".
+          format(user["name"], len(completed_tasks), len(data)))
+    [print("\t " + task) for task in completed_tasks]
